@@ -1,0 +1,19 @@
+     [! Header 1 !]      
+Headers must begin and end a line, but may be surrounded by spaces.
+
+[!! Header 2 !!]
+
+[!!!Header 3!!!]
+[!!!!Header 4!!!!]
+[!!!!!Header5!!!!!]
+[!!!!!!Header6!!!!!!]
+
+[!!! Entities [ae] ['i]n headers should be fine !!!]
+
+          [!!! You can break headers
+                   over lines
+             but that's kind of odd !!!]
+
+[!!! [*Bold*], [/italic/], and [=code=] should work !!!]
+
+[!!! A [!!! Header !!!] in a header--NO !!!]

@@ -1,0 +1,31 @@
+================= =============== =======================
+A Short Heading   A Longer Heading Spanning Two Columns
+----------------- ---------------------------------------
+Three             Columns         Still Headings
+----------------- --------------- -----------------------
+The first two headings combined   The last alone
+================================= =======================
+In                The             Table
+----------------- --------------- -----------------------
+Each row is       indicated by a  line of minuses
+----------------- --------------- -----------------------
+Which means       Or to combine two columns together,
+it's possible     simply by extending the line of minuses
+to put a lot      (or equal signs, if it's the last row)
+in one cell       below them
+----------------- ---------------------------------------
+It's a little     The cell to the left of these
+dicey, but you    --------------- -----------------------
+can combine       spans two       rows.
+rows.
+----------------- --------------- -----------------------
+More complicated  This column has This has one on top
+still is a row    two rows on     -----------------------
+in which the      top             with two on the 
+other cells are   --------------- bottom. Because the row
+split in an       and only one    breaks don't line up.
+inconsistent      on the bottom.
+way.
+----------------- --------------- -----------------------
+You can even finish the table with one big column.
+=========================================================

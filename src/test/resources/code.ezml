@@ -1,0 +1,15 @@
+There are some code examples here:
+	this is code
+	  this line should be indented two more spaces
+	the next line is blank, but should still be part of the code block
+
+	just as this one is
+	[=code=], [*bold*], [/italic/], 
+	[^super^]script, and [_sub_]script should be allowed.
+This should still be part of the above paragraph, but outside code.
+
+This is a new paragraph:
+	with some code
+	  in it
+	  
+And another new paragraph.

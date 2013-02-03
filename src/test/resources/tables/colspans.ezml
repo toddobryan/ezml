@@ -1,0 +1,10 @@
+========== ========= ===========
+Colspan    Example Table
+========== =====================
+The header have 1    and 1
+should     short     long column
+---------- --------- -----------
+The row above this   and this
+should have 3 cols   has 1 long
+                     and 1 short
+==================== ===========

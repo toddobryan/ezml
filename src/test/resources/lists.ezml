@@ -1,0 +1,50 @@
+These are some lists:
+ * this is an unordered list
+ * with a few bullets
+ * One thing to check is whether a single bullet can continue onto multiple
+   lines without a problem. Ideally, the text should just be run together into
+   one big list item.
+ * Unfortunately, that raises the question of what to do with multiple
+   paragraphs in a list item.
+   
+   I'd prefer not to add <p> tags inside a list unless it would consist of
+   multiple paragraphs.
+   
+   But if it does consist of multiple paragraphs, that's exactly what you have
+   to do.
+   
+Now, this should no longer be part of the list above, but because there's a
+blank line in front of it, it should be a new paragraph.
+ * It [*is*] possible, of course, to continue the same paragraph after a list.
+Like this one. Which should be all a single paragraph.
+
+Other kinds of lists are reasonable:
+ 1. numbered lists
+ #. where each
+ #. element gets larger
+  1. this is a list
+  #. within another list
+
+It would also be nice if EZML recognized:
+ A. Alpha
+ #. numbering
+ #. style
+or
+ a. alpha
+ #. if we wanted
+or
+ I. Roman
+ #. numerals
+ #. uppercase
+or
+ i. little roman numerals
+ #. which are cute
+ 
+It would also be convenient if you could override numbers:
+ 2. This is #2.
+ 5. We've skipped ahead to 5.
+ 7. And this is 7.
+or start somewhere other than 1 and number automatically.
+ III. this should be Roman 3.
+ #. Roman 4
+ #. Roman 5

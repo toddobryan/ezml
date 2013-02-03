@@ -116,6 +116,10 @@ trait EzmlTokens extends Tokens {
   case class TABLE(s: String) extends Token {
     def chars = s
   }
+  
+  case class DASH(num: Int) extends Token {
+    def chars = "-" * num
+  }
 
   case class SPACE(num: Int) extends Token {
     def chars = " " * num
@@ -159,14 +163,14 @@ trait EzmlTokens extends Tokens {
 }
 
 
-class EzmlLexical extends Lexical with RegexParsers with EzmlTokens {
+object EzmlLexer extends Lexical with RegexParsers with EzmlTokens {
   override type Elem = Char
   type Tokens = EzmlTokens
   val TAB_WIDTH = 4
 
   import util.parsing.input.CharSequenceReader.EofCh
 
-  def tokens: Parser[List[Token]] = (token +)~eof ^^ { case tl~_ => tl :+ MY_EOF() }
+  def tokens: Parser[List[Token]] = (token.+)~eof ^^ { case tl~_ => tl :+ MY_EOF() }
 
   def eof: Parser[Token] = EofCh ^^^ MY_EOF()
   
@@ -180,24 +184,27 @@ class EzmlLexical extends Lexical with RegexParsers with EzmlTokens {
       | "]]" ^^^ R_BRACKET
       | "[/]" ^^^ BREAK
       | """\[(%s)\]""".format(entities).r ^^ (s => ENTITY(s.substring(1, s.length - 1)))
-//      | """\[!{1,6}""".r ^^ (s => L_HEADER(s.length - 1))
-//      | """!{1,6}\]""".r ^^ (s => R_HEADER(s.length - 1))
-//      | """\[[\*=/^_8@#\(\{]""".r ^^ (s => L_TAG(s.substring(1)))
-//      | """[\*=/^_8@#\)\}]\](?!=\])""".r ^^ (s => R_TAG(s.substring(0, s.length - 1)))
-//      | """>[ \t]*""".r ^^ (s => QUOTE_MARK(s.replace("\t", " " * TAB_WIDTH).length - 1))
+      | """\[!{1,6}""".r ^^ (s => L_HEADER(s.length - 1))
+      | """!{1,6}\](?!\])""".r ^^ (s => R_HEADER(s.length - 1))
+      | """\[[\*=/^_8@#\(\{]""".r ^^ (s => L_TAG(s.substring(1)))
+      | """[\*=/^_8@#\)\}]\](?!\])""".r ^^ (s => R_TAG(s.substring(0, s.length - 1)))
+      | """>[ \t]*""".r ^^ (s => QUOTE_MARK(s.replace("\t", " " * TAB_WIDTH).length - 1))
+      | """-+""".r ^^ (s => DASH(s.length))
 //      | """(\t| )[ \t]*""".r ^^ (s => SPACE(s.replace("\t", " " * TAB_WIDTH).length))
 //      | """\*\s*""".r ^^ (s => UNORDERED_BULLET())
 //      | """((%s)\.)\s*""".format(listStarts).r ^^ (s => NUMBERED_BULLET(s))
-//      | """\r\n|\n|\r""".r ^^ (s => NEWLINE())
+      | """\r\n|\n|\r""".r ^^^ NEWLINE
 //      | """[^\[\]\n\!]+(?:(?!\])|(?=\]\]))""".r ^^ (s => TEXT(s))
-//      | """(\[|\]|\!)""".r ^^ (s => TEXT(s))
+      | """([^\[\] \n\-](?!(?:!{1,6}|[\*=/^_8@#\)\}])\]))*[^\[\] \n\-]""".r ^^ (s => TEXT(s))
   )
     
   def Scanner(input: String) = new Scanner(input)
   def Scanner(input: Reader[Char]) = new Scanner(input)
   
-  def tokens(input: String) = Stream.iterate(new Scanner(input))(_.rest).takeWhile(!_.atEnd).map(_.first).toList  
+  def tokens(input: String): List[Token] = 
+    Stream.iterate(EzmlLexer.Scanner(input))(_.rest).takeWhile(!_.atEnd).map(_.first).toList
 
+  
 //  def Scanner(input: String): Reader[Token] = {
 //    class TokenReader(val theTokens: List[Token]) extends Reader[Token] {
 //      def atEnd = theTokens.isEmpty

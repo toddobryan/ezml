@@ -1,0 +1,50 @@
+<p>These are some lists:
+<ul><li>this is an unordered list</li>
+<li>with a few bullets</li>
+<li>One thing to check is whether a single bullet can continue onto multiple
+  lines without a problem. Ideally, the text should just be run together into
+  one big list item.</li>
+<li><p>Unfortunately, that raises the question of what to do with multiple
+  paragraphs in a list item.</p>
+
+<p>  I'd prefer not to add &lt;p&gt; tags inside a list unless it would consist of
+  multiple paragraphs.</p>
+
+<p>  But if it does consist of multiple paragraphs, that's exactly what you have
+  to do.</p></li></ul></p>
+
+<p>Now, this should no longer be part of the list above, but because there's a
+blank line in front of it, it should be a new paragraph.
+<ul><li>It [*is*] possible, of course, to continue the same paragraph after a list.</li></ul>
+Like this one. Which should be all a single paragraph.</p>
+
+<p>Other kinds of lists are reasonable:
+<ol style="list-style-type: decimal;"><li value="1">numbered lists</li>
+<li>where each</li>
+<li>element gets larger
+<ol style="list-style-type: decimal;"><li value="1">this is a list</li>
+<li>within another list</li></ol></li></ol></p>
+
+<p>It would also be nice if EZML recognized:
+<ol style="list-style-type: upper-alpha;"><li value="1">Alpha</li>
+<li>numbering</li>
+<li>style</li></ol>
+or
+<ol style="list-style-type: lower-alpha;"><li value="1">alpha</li>
+<li>if we wanted</li></ol>
+or
+<ol style="list-style-type: upper-roman;"><li value="1">Roman</li>
+<li>numerals</li>
+<li>uppercase</li></ol>
+or
+<ol style="list-style-type: lower-roman;"><li value="1">little roman numerals</li>
+<li>which are cute</li></ol></p>
+
+<p>It would also be convenient if you could override numbers:
+<ol style="list-style-type: decimal;"><li value="2">This is #2.</li>
+<li value="5">We've skipped ahead to 5.</li>
+<li value="7">And this is 7.</li></ol>
+or start somewhere other than 1 and number automatically.
+<ol style="list-style-type: upper-roman;"><li value="3">this should be Roman 3.</li>
+<li>Roman 4</li>
+<li>Roman 5</li></ol></p>

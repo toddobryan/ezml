@@ -1,0 +1,24 @@
+[! h1 !]
+[!! h2 !!]
+[!!! h3 !!!]
+[!!!! h4 !!!!]
+[!!!!! h5 !!!!!]
+[!!!!!! h6 !!!!!!]
+
+paragraph
+
+[#
+====== =======
+Table  Columns
+====== =======
+Like   these
+------ -------
+and    these
+====== =======
+#]
+
+In text, a [8 http://www.google.com link "Google homepage" 8] to someplace. Or a [8 Google 8] link, given below.
+
+[8 Google 8]: http://www.google.com "Google homepage"
+
+We can also include footnotes[(A footnote is text that doesn't belong in the body of a document and should get linked to. A link at the footnote should link back.)]

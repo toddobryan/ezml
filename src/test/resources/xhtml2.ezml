@@ -1,0 +1,78 @@
+[! XHTML 2.0 !]
+
+The XHTML 2.0 model is considerably richer than XHTML 1.0. It includes several new tags that allow authors to more finely encode content. Alas, many of these are too complicated for EZML to deal with.
+
+For example, we don't do anything with forms in EZML, yet.
+
+[!! XHTML Constructs !!]
+
+[!!! Heading !!!]
+
+The [/Heading/] section allows only:
+ * [=<h1>=]-[=<h6>=]
+   * each allows [/Text/]
+
+[!!! Structural !!!]
+
+Not addressed: [=<address>=], [=<blockcode>=], [=<div>=], [=<link>=], [=<meta>=],  [=<handler>=], [=<section>=], [=<separator>=]
+
+The [/Structural/] section allows:
+ * [/List/]
+ * [=<table>=]
+ * [=<p>=]
+   * [/Text/], [/List/], [=<blockquote>=], [=<pre>=], or [=<table>=]
+ * [=<pre>=], which allows
+   * [/Text/]
+ * [=<blockquote>=], which allows
+   * [/Flow/]
+ 
+The [=<blockcode>=] tag, once supported, might be appropriate to use with the addition of language-specific parsers. The only problem is that it allows all the same elements as [=<blockquote>=], so formatting could be difficult.
+
+[!!! Text !!!]
+
+Not addressed: [=<abbr>=], [=<cite>=], [=<dfn>=], [=<kbd>=], [=<link>=], [=<l>=] [=<meta>=], [=<object>=], [=<q>=], [=<ruby>=], [=<samp>=], [=<span>=], [=<var>=]
+
+The [/Text/] section allows:
+ * [=<code>=], which allows
+   * [/Text/]
+ * [=<em>=], which allows
+   * [/Text/]
+ * [=<strong>=], which allows
+   * [/Text/]
+ * [=<sub>=], which allows
+   * [/Text/]
+ * [=<sup>=], which allows
+   * [/Text/]
+   
+The [=<br/>=] tag is being deprecated and replaced with [=<l>.[= Once it is more commonly supported, we should make that change.
+
+Also, although XHTML 2.0 allows both [=<a>=] and [=<img>=] tags, these are no longer strictly necessary as the [=href=] and [=src=] attributes are now allowed on any element.
+
+[!!! Flow !!!]
+
+The [/Flow/] section allows:
+ * [/Heading/]
+ * [/Structural/]
+ * [/Text/]
+
+[!!! List !!!]
+
+Not addressed: [=<dd>=], [=<di>=], [=<dl>=], [=<dt>=], [=<label>=], [=<nl>=]
+
+The [/List/] section allows:
+ * [=<ol>=] or [=<ul>=], which allow
+   * a list of [=<li>=], each of which allows
+     * [/Flow/]
+
+[!!! [=<table>=] !!!]
+
+Not addressed: [=<caption>=], [=<summary>=], [=<col>=], [=<colgroup>=], [=<thead>=], [=<tfoot>=], [=<tbody>=]
+
+[=<table>=] allows a list of:
+ * [=<tr>=], which allows a list of 
+   * [=<td>=] or [=<th>=], which allow
+     * [/Flow/]
+     
+[!! EZML Constructs !!]
+
+EZML has two constructs which do not correlate precisely with XHTML: footnotes and link names. These must be dealt with in some way other than simply lookup and replacement.

@@ -1,0 +1,12 @@
+All HTML 4.0 entities and character codes are allowed in EZML documents, except
+&amp;, &lt;, and &gt;. For these three, the characters &, <, and > should be
+used and EZML will automatically convert them to the given entities.
+
+For example, the entities in the list below should not be converted:
+ * &eacute;
+ * &euro;
+ * &#960;
+But these should be converted to their entity equivalents:
+ * &
+ * <
+ * >

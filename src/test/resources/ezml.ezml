@@ -1,0 +1,33 @@
+[! EZML - An Easy Markup Language !]
+
+[*EZML*] is designed to be an easy to use markup language. In particular, it
+combines ideas from many different sources to create a language that is both
+easy to remember and natural to use.
+
+Probably the greatest single influence on EZML is John Gruber's [8 Markdown 8].
+I admire Markdown for its simplicity and readability. Markdown documents
+look like what they're supposed to represent--they don't have weird tags or
+complicated structure that makes it difficult to see what the writer intended.
+
+[!!! Avoiding Ambiguity !!!]
+
+On the other hand, Markdown is flexible in some places where it doesn't need to
+be. Because its audience is experienced web writers, this makes sense. My
+audience is different--students and teachers who have very little experience
+writing for the web. With a neophyte audience, flexibility is more likely to
+lead to confusion than to a sense of empowerment. For that reason, I've
+attempted to root out all cases of ambiguity. In EZML, there's one way to do
+things, and one way only.
+
+[!!! Making It Hard to Mess Up Normal Prose !!!]
+
+One of the other problems with Markdown is that a few of its formatting
+characters get substantial use in normal English prose. For example, Markdown
+uses brackets for HTML links. That's usually fine, but brackets also appear in
+quotes, math, and science quite a bit. What's more, when people are writing
+them, they're not likely to think about needing to escape them. Similarly, it's
+very natural for someone to begin a line with "#5". (Check this...does it need
+a space?)In Markdown, this would create a large header and our newbie writer
+would be very confused.
+
+[8 Markdown 8]: http://daringfireball.net/projects/markdown/ "Markdown"

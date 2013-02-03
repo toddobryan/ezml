@@ -1,0 +1,520 @@
+[! Syntax !]
+
+EZML is designed to be easy to remember and use. Every formatting command
+consists of a bracket followed by a character designed to remind you of what
+it means. For example, headers are important! So the header above is written
+by enclosing the title in exclamation points with brackets--[=[[! Syntax !]]=].
+The bracket lets you know that the next character is a formatting character and
+the exclamation point should remind you of a header, because headers are
+important! After you've typed the header, you use the same formatting character
+and a close bracket to let EZML know you're done.
+
+All the other formatting characters are similar. If you're formatting text, you
+use an open-bracket, a formatting character, type the text, same formatting
+character, and a close bracket. Since the formatting characters have been
+chosen to be easy to remember, you should be able to figure them out without a
+lot of trouble.
+
+[!![@chars@] Special Characters !!]
+
+One of the strengths of HTML is that it's designed to be used by people all
+over the world and it has been able to handle international character sets from
+its beginning. Unfortunately, it has sometimes been difficult to type those
+characters, but with EZML it's--you guessed it--easy.
+
+To type an accented character, you use brackets followed by a character that
+should remind you of the accent. For an acute accent, we use the apostrophe: '.
+For a grave accent, we use the grave accent at the top left of the keyboard: `.
+A [,c] is created by typing [=[[,c]]=]. It's that simple. There are a few characters
+that aren't really accented, but are a combination of two or more characters. Examples
+include the [sz] from German, the [ae] and [oe] ligatures, or the ellipsis [...]
+character. As you might expect, there are codes to handle these cases, too.
+Here's a collection of some of the characters you might need to type:
+[#
+=====================================  =========================================================================
+Character                              EZML
+=====================================  =========================================================================
+['a], ['e], ['i], ['o], ['u], ['y][/]  [=[['a]]=], [=[['e]]=], [=[['i]]=], [=[['o]]=], [=[['u]]=], [=[['y]]=][/]
+['A], ['E], ['I], ['O], ['U], ['Y]     [=[['A]]=], [=[['E]]=], [=[['I]]=], [=[['O]]=], [=[['U]]=], [=[['Y]]=]
+-------------------------------------  -------------------------------------------------------------------------
+[`a], [`e], [`i], [`o], [`u][/]        [=[[`a]]=], [=[[`e]]=], [=[[`i]]=], [=[[`o]]=], [=[[`u]]=][/]
+[`A], [`E], [`I], [`O], [`U]           [=[[`A]]=], [=[[`E]]=], [=[[`I]]=], [=[[`O]]=], [=[[`U]]=]
+-------------------------------------  -------------------------------------------------------------------------
+[^a], [^e], [^i], [^o], [^u][/]        [=[[^a]]=], [=[[^e]]=], [=[[^i]]=], [=[[^o]]=], [=[[^u]]=][/]
+[^A], [^E], [^I], [^O], [^U]           [=[[^A]]=], [=[[^E]]=], [=[[^I]]=], [=[[^O]]=], [=[[^U]]=]
+-------------------------------------  -------------------------------------------------------------------------
+["a], ["e], ["i], ["o], ["u], ["y][/]  [=[["a]]=], [=[["e]]=], [=[["i]]=], [=[["o]]=], [=[["u]]=], [=[["y]]=][/]
+["A], ["E], ["I], ["O], ["U], ["Y]     [=[["A]]=], [=[["E]]=], [=[["I]]=], [=[["O]]=], [=[["U]]=], [=[["Y]]=]
+-------------------------------------  -------------------------------------------------------------------------
+[~a], [~n], [~o][/]                    [=[[~a]]=], [=[[~n]]=], [=[[~o]]=][/]
+[~A], [~N], [~O]                       [=[[~A]]=], [=[[~N]]=], [=[[~O]]=]
+-------------------------------------  -------------------------------------------------------------------------
+[,c], [,C]                             [=[[,c]]=], [=[[,C]]=]
+-------------------------------------  -------------------------------------------------------------------------
+[ae], [AE], [oe], [OE], [sz], [...]    [=[[ae]]=], [=[[AE]]=], [=[[oe]]=], [=[[OE]]=], [=[[sz]]=], [=[[...]]=]
+-------------------------------------  -------------------------------------------------------------------------
+[^!], [^?]                             [=[[^!]]=], [=[[^?]]=]
+-------------------------------------  -------------------------------------------------------------------------
+[oa], [/o][/]                          [=[[oa]]=], [=[[/o]]=]
+[oA], [/O]                             [=[[oA]]=], [=[[/O]]=]
+=====================================  =========================================================================
+#]
+
+[!![@p@] Paragraphs !!]
+
+To create a paragraph in EZML, simply leave a blank line after a series of
+lines. These lines may be hard- or soft-wrapped. In other words, you may or may
+not press the return key at the end of each line. If your editor wraps text
+automatically, you don't need to bother. If it doesn't, hit return when you feel
+like it, and EZML will create a paragraph that grows or shrinks with the size
+of the web browser's window.
+	This is a bunch of lines
+	of text that will become
+	a single paragraph of HTML.
+will become
+	<p>This is a bunch of lines of text that will become a single paragraph of HTML.</p>
+and it will be up to the web browser to format it correctly.
+
+[!![@br@] Linebreaks !!]
+
+In standard paragraphs, it's sometimes the case that you want to force
+linebreaks to happen at certain points, for example, if you're typing a poem.
+Stealing an idea from what you do if you want to indicate linebreaks in a poem,
+the formatting character / means to go to the next line. Like all formatting
+characters, it's enclosed in brackets: [=[[/]]=]. Here's a little excerpt from
+an A.E. Housman poem:
+	When I was one-and-twenty[[/]]I heard a wise man say,[[/]]'Give crowns and
+	pounds and guineas[[/]]But not your heart away;
+which gets rendered as:
+	When I was one-and-twenty[/]I heard a wise man say,[/]'Give crowns and
+	pounds and guineas[/]But not your heart away;
+just the way a poem should be.
+
+Remember that linebreaks should mostly take care of themselves. Only insert them
+if you have a very good reason. Since EZML has ways to handle lists, block
+quotations, and other situations where you might be tempted to use your own
+linebreaks, make sure there's not a better way to handle what you're trying to
+do.
+
+[!![@styles@] Text Styles !!]
+
+One of the major advantages of HTML over standard plain text documents is that
+it can typeset text in different styles. Some examples:
+ * [*bold*] text, when you want to make a point
+ * [/italic/] text, when you want to put your own slant on things
+ * [=typewriter=] or [=monospace=] font is good for text that a user might have
+   to enter into a computer
+ * E=mc[^2^] is perhaps the most famous example of an equation with a [^super^]script
+ * H[_2_]O shows an example of [_sub_]scripted text
+Each of these examples is very easy to create in EZML.
+
+[!!! Bold !!!]
+
+To create bold text, surround it with [=[[*=] and [=*]]=]. You've probably used
+the asterisk character to emphasize words in email messages, because it's *so*
+common to do that. If you can remember that *[...]* is emphasis, you just have
+to add the brackets and you can [*bold whatever you'd like*].
+
+[!!! Italics !!!]
+
+Because italics lean to the right, the forward slash character, [=/=] should
+scream [/italics/] to you. To put [/anything/] in italics simply wrap it in
+[=[[/=] and [=/]]=].
+
+[!!! Typewriter/Monospace Font !!!]
+
+The unique characteristic of a typewriter font is that every character, from a
+wide character like [/m/] to a narrow character like [/i/], takes an equal
+amount of horizontal space. Because of that fact, [=[[==] and [==]]=] serve to wrap
+anything you'd like to appear in a typewriter font. 
+
+[!!! Superscript and Subscript !!!]
+
+Superscripted text has been raised up. Because the caret symbol, [=^=] (shift-6
+on U.S. keyboards) looks like a little up-arrow, you wrap superscripted text
+between [=[[^=] and [=^]]=]. For example, if a chemist wanted to write O[^2-^],
+it's as simple as [=O[[^2-^]]=].
+
+In contrast, subscripts are low. Since the underscore character, [=_=]
+(shift-hyphen), is as low as you can get, wrap subscripted text in [=[[_=] and
+[=_]]=]. For example, a mathematician might define the Fibonacci numbers in this
+way: f[_n_]=f[_n-1_]+f[_n-2_], which would be written
+[=f[[_n_]]=f[[_n-1_]]+f[[_n-2_]]=].
+
+[!!! Mix and Match !!!]
+
+You can combine all of these text styles together however you wish. Want
+[*[/bold and italic/]*] text? No problem. Just type
+[=[[*[[/bold and italic/]]*]]=]. The one thing to be careful of is to [/nest/]
+your styles within one another. In other words, [*it's perfectly fine to put
+[/some italic text/] inside a run of bold*]. What's not okay is to try this:
+	[[* bold stuff [[/now italic*]] uh-oh, we tried to quit bold before the
+	italic was over/]] This is very bad.
+Nested formatting--formatting which is entirely contained within another style--
+is perfectly fine. Overlapping styles [/[*aren't*]/].
+
+Here's an easy way to remember it: You always have to finish the last thing you
+started before you can finish anything else. If you're in a bold passage, feel
+free to add some superscript. But you have to close the superscript before you
+can close the bold. If you don't, you just confuse the EZML system and could
+possibly crash the whole internet[(not_really)].
+
+[(not_really)]: Stop worrying! You can't really crash the whole internet just
+ by not following my directions. What you can do is cause the EZML processor to
+ create XHTML code that is not well-formed and that would make me very sad. 
+
+[!! Headers !!]
+
+One thing that you'll probably want to do is to break your text into smaller
+parts. To add a heading to each part, create a line with just [=[[!=] and
+[=!]]=] with the title between them and skip a line afterward. Make sure that
+the number of exclamation points matches at each end or you won't get a header,
+you'll get actual exclamation points. Also, feel free to put spaces around the
+title; these will disappear in the final document.
+
+Actually, there are six levels of headings--the more exclamation points, the
+[/smaller/] the heading becomes. (This may seem counterintuitive, but it's rare
+to use sizes four through six in real documents, so they take more keystrokes
+to type. Just remember the aphorism "less is more" and you'll be fine.) Here are
+all the header possibilities:
+
+[! Header1 [[! Header1 !]] !]
+
+[!! Header2 [[!! Header2 !!]] !!]
+
+[!!! Header3 [[!!! Header3 !!!]] !!!]
+
+[!!!! Header4 [[!!!! Header4 !!!!]] !!!!]
+
+[!!!!! Header5 [[!!!!! Header5 !!!!!]] !!!!!]
+
+[!!!!!! Header6 [[!!!!!! Header6 !!!!!!]] !!!!!!]
+
+Note that headers above level 3 or so start becoming smaller than standard text,
+so you may want to avoid using them unless you have a very good reason.
+
+[!! Tables !!]
+
+Tables are delimited by [=[[#=]] and [=#]]=] characters because the
+[=#=] sign looks a bit like a small table (or at least a Tic-Tac-Toe grid).
+At the top of the table use [===] characters to delimit all of the columns
+below. Within the table you indicate row breaks using lines of [=-=]'s.
+Optionally, you may replace one of the lines of [=-=]'s with a line of
+[===]'s. All rows above this line will be considered headers and will
+usually be rendered in a bold font. The line of symbols indicating the
+end of the table is also a line of [===]'s. 
+
+The line of [===]'s or [=-=]'s [/below/] each row indicates how the row should
+be broken up. If you leave spaces, the text will be broken into columns. If
+you run the signs together, the columns will be combined into a single
+cell. The only rule is that you must indicate all possible columns in the
+first line of [===]'s, but within the table you can combine cells however
+you wish.
+
+You can also combine rows into a larger cell by indicating broken partial
+row lines with [=-=]'s. [(The line indicating where the headers end may
+[/not/] be a partial line, but must span the whole table. It's not clear
+what partial headers would be, anyway.)]
+
+Here's an example:
+	================= =============== =======================
+	A Short Heading   A Longer Heading Spanning Two Columns
+	----------------- ---------------------------------------
+	Three             Columns         Still Headings
+	----------------- --------------- -----------------------
+	The first two headings combined   The last alone
+	================================= =======================
+	In                The             Table
+	----------------- --------------- -----------------------
+	Each row is       indicated by a  line of minuses
+	----------------- --------------- -----------------------
+	Which means       Or to combine two columns together,
+	it's possible     simply by extending the line of minuses
+	to put a lot      (or equal signs, if it's the last row)
+	in one cell       below them
+	----------------- ---------------------------------------
+	It's a little     The cell to the left of these
+	dicey, but you    --------------- -----------------------
+	can combine       spans two       rows.
+	rows.
+	----------------- --------------- -----------------------
+	More complicated  This column has This has one on top
+	still is a row    two rows on     -----------------------
+	in which the      top             with two on the 
+	other cells are   --------------- bottom. Because the row
+	split in an       and only one    breaks don't line up.
+	inconsistent      on the bottom.
+	way.
+	----------------- --------------- -----------------------
+	You can even finish the table with one big column.
+	=========================================================
+which renders as [#
+================= =============== =======================
+A Short Heading   A Longer Heading Spanning Two Columns
+----------------- ---------------------------------------
+Three             Columns         Still Headings
+----------------- --------------- -----------------------
+The first two headings combined   The last alone
+================================= =======================
+In                The             Table
+----------------- --------------- -----------------------
+Each row is       indicated by a  line of minuses
+----------------- --------------- -----------------------
+Which means       Or to combine two columns together,
+it's possible     simply by extending the line of minuses
+to put a lot      (or equal signs, if it's the last row)
+in one cell       below them
+----------------- ---------------------------------------
+It's a little     The cell to the left of these
+dicey, but you    --------------- -----------------------
+can combine       spans two       rows.
+rows.
+----------------- --------------- -----------------------
+More complicated  This column has This has one on top
+still is a row    two rows on     -----------------------
+in which the      top             with two on the 
+other cells are   --------------- bottom. Because the row
+split in an       and only one    breaks don't line up.
+inconsistent      on the bottom.
+way.
+----------------- --------------- -----------------------
+You can even finish the table with one big column.
+=========================================================#]
+
+As another example, here's a truth table:
+	====== ====== =======
+	Inputs        Output
+	------------- -------
+	A      B      A or B
+	====== ====== =======
+	True   True   True
+	------ ------ -------
+	True   False  True
+	------ ------ -------
+	False  True   True
+	------ ------ -------
+	False  False  False
+	====== ====== =======
+which would be rendered as
+[#====== ====== =======
+Inputs        Output
+------------- -------
+A      B      A or B
+====== ====== =======
+True   True   True
+------ ------ -------
+True   False  True
+------ ------ -------
+False  True   True
+------ ------ -------
+False  False  False
+====== ====== =======#]
+
+[!! Lists !!]
+
+You can type two kinds of lists in EZML, bulleted and numbered. 
+
+[!!! Bulleted Lists !!!]
+
+In a bulleted list, each element appears indented, with a bullet to its
+left. To create a bulleted list, put one or more spaces (but not enough to
+trigger a pre-formatted block), an asterisk, and each item. If you indent
+farther in subsequent lines, you'll get sublists. For example
+ * This is a list
+ * Each element has a bullet
+   * but you can also
+     * create smaller sublists
+     * inside each bullet
+   * by lining up the asterisks
+ * so the system is pretty flexible
+can be created by typing
+	 * This is a list
+	 * Each element has a bullet
+	   * but you can also
+	     * create smaller sublists
+	     * inside each bullet
+	   * by lining up the asterisks
+	 * so the system is pretty flexible
+which looks an awful lot like a list.
+
+[!!! Numbered Lists !!!]
+
+Numbered lists are created in a similar way. You begin the list by indenting
+a space or two, writing a number symbol (#) followed by a period, and then
+typing the list item. Here's a list:
+ #. This is a numbered list.
+ #. Things are numbered in order.
+   #. You can also create sublists.
+   #. And they're numbered, too.
+ #. Which is kind of cool.
+and here's how you'd type that:
+	 #. This is a numbered list.
+	 #. Things are numbered in order.
+	   #. You can also create sublists.
+	   #. And they're numbered, too.
+	 #. Which is kind of cool.
+	 
+Numbered lists are, however, much more flexible. If you don't want to start the
+list at number one, just replace the number sign with the number you want. In
+fact, you can override any number in the list, which is useful if you're
+listing things that don't come in strict numeric order:
+ 3. This is #3.
+ 5. This is #5.
+ #. This is automatic numbering.
+ #. And this one, too.
+ 33. Jump ahead to #33.
+ #. Continue automatic numbering.
+which you'd type as:
+	 3. This is #3.
+	 5. This is #5.
+	 #. This is automatic numbering.
+	 #. And this one, too.
+	 33. Jump ahead to #33.
+	 #. Continue automatic numbering.
+
+[!!! Numbering Without Numbers !!!]
+
+Numbered lists can be numbered in ways other than simple Arabic numbers.
+Other styles include alphabetic numbering (A-Z) or numbering with Roman
+numerals (I, II, III, IV, etc.). Either of these can be used in upper- or
+lower-case. To start something using alphabetic or Roman numbering, put a
+letter or Roman number as the first element.
+ I. Upper-Case Roman
+   A. Upper-Case Alphabetic
+   #. This is automatic.
+     1. Arabic
+     #. also automatic
+       a. lower-case alphabetic
+         i. lower-case Roman
+         #. automatic
+         #. automatic
+       #. automatic
+     #. automatic
+ #. Automatic
+   C. This starts at C.
+   #. And continues automatically.
+     iv. I can start at Roman 4.
+     #. and continue automatically.
+     #. which took a long time to program.
+is written as:
+	 I. Upper-Case Roman
+	   A. Upper-Case Alphabetic
+	   #. This is automatic.
+	     1. Arabic
+	     #. also automatic
+	       a. lower-case alphabetic
+	         i. lower-case Roman
+	         #. automatic
+	         #. automatic
+	       #. automatic
+	     #. automatic
+	 #. Automatic
+	   C. This starts at C.
+	   #. And continues automatically.
+	     iv. I can start at Roman 4.
+	     #. and continue automatically.
+	     #. which took a long time to program.
+Note that you can't start lists at [*letters*] I, V, or X because the system
+will think you mean the Roman numeral. C, D, L, and M, however, work because
+it's less likely that you'd want to start with 100, 500, 50, or 1000 than with
+those letters.
+
+[!! Links !!]
+
+Hypertext wouldn't be hypertext without the ability to link to other pages
+and sites. In EZML, there are several ways to type links, but all use brackets
+with an 8 just inside them: [=[[8 this is a link 8]]=]. The number 8 was
+chosen because it resembles two links in a chain.
+
+[!!! Bare Links !!!]
+
+The easiest (and perhaps least useful way) to provide a link is to simply
+put the URL in link brackets:
+    [[8 http://www.google.com 8]]
+which gets rendered as [8 http://www.google.com 8]
+
+[!!! Links with Text (and Tooltip Titles, Too) !!!] 
+
+In addition to simply providing the URL, you can also provide the text that
+will appear as the link. For example:
+    [[8 http://www.google.com Google's homepage 8]]
+is rendered as [8 http://www.google.com Google's homepage 8].
+
+Finally, you can include a third piece of information. If you include a
+title for the link, it will be shown as a tooltip if someone hovers over
+the link long enough. Simply enclose the title in double quotes after
+the link text. (You can't include a title unless you also include link
+text, or EZML will think you want the title to be the link text.)
+For example:
+    [[8 http://www.google.com Google "Google's homepage" 8]]
+which gets rendered as [8 http://www.google.com Google "Google's homepage" 8]
+(make sure to hover over the link to see the tooltip).
+
+[!!! Named Links !!!]
+
+You may have noticed that links can get a little long if you include all their
+information. To prevent your document from being fragmented by links there's a
+much prettier way to put them in your document that increases readability and
+makes it easier to manage them.
+
+You can create a named link by writing a link, a colon, the URL, and
+(optionally) a link title in quotation marks. Here, for example, are a few
+named links:
+	[[8 Google 8]]: http://www.google.com "Google Homepage"
+	[[8 Python 8]]: http://www.python.org
+	[[8 Ubuntu 8]]: http://www.ubuntu.com "Ubuntu - Linux for Human Beings"
+You can place these anywhere you'd like in a document. Common choices are after
+the first paragraph they're used, or in a group at the bottom of your document.
+If a named link is listed anywhere in the document, you can use the name
+instead of the whole URL. There are a couple of restrictions: link names can't
+contain any spaces and they must be unique within a document. To make it easy
+to use them anywhere in a sentence, link names are not case sensitive.
+
+[8 Google 8]: http://www.google.com "Google Homepage"
+
+For example, [=[[8 Google 8]]=] would provide a link to the Google homepage
+defined in the named link above. If that's all you put, [8 Google 8] will act
+as the link text [/and/] the URL and the tooltip will be grabbed from the named
+link. If you want different link text or a different tooltip, you can provide
+them as shown here:
+	[[8 Google the Google homepage 8]]
+	Click [[8 Google here "This is the Google homepage link" 8]] to go to Google.
+	You should capitalize [[8 google 8]], but you don't have to.
+These render as:
+[8 Google the Google homepage 8][/]
+Click [8 Google here "This is the Google homepage link" 8] to go to Google.[/]
+You should capitalize [8 google 8], but you don't have to.[/]
+
+[!!! Links Within a Document !!!]
+
+To mark a part of the document as something you might want to link to, either
+from a table of contents or from another section, use the [=[[@=] and [=@]]=]
+tags with a unique name inside. For example, inside the [*Special Characters*]
+header above, I included [=[[@ chars @]]=] before the text of the header. As a
+result, I can now send you back to that point in the document using a link:
+	Go back to the [[8 #chars special characters section 8]]
+gets rendered as[/]
+Go back to the [8 #chars special characters section 8].
+
+Notice that the word [/chars/] doesn't appear in the spot where you place the
+[=[[@ chars @]]=] information--it only provides a place for you to link to.
+Also note the number sign before the word [/chars/] in the internal link.
+
+[!! Footnotes !!]
+
+If you want to say something[(irrelevant)], you can use a footnote.
+
+[(irrelevant)]: And by something, we mean something that doesn't really fit in
+with what you're currently talking about. 
+
+[!! Blockquotes !!]
+
+> This is a blockquote.
+> > This is a blockquote in a blockquote.
+> Back to the original level
+>     Here's some preformatted code
+>     inside the blockquote.
+
+[!! Images !!]
+
+Use [{ pic.png alt text }].
