@@ -1,8 +1,8 @@
 package ezml
 
 import org.scalatest.FunSuite
-
 import EzmlLexer._
+import scala.io.Source
 
 class TestLexer extends FunSuite {
   def tokens(input: String): List[Token] = 
@@ -29,9 +29,18 @@ class TestLexer extends FunSuite {
            ENTITY("'A"), ENTITY("'E"), ENTITY("'I"), ENTITY("'O"), ENTITY("'U"), ENTITY("'Y")))
    //TODO: rest of the entities
   }
+  
+  //test("files") {
+  //  import Examples.fileContents
+  //  assert(tokens(fileContents("/blockquotes.ezml")))
+  //}
 }
 
 object Examples {
+  def fileContents(filename: String): String = {
+    Source.fromInputStream(getClass.getResourceAsStream(filename)).mkString
+  }
+  
   val e1 = 
 """[! Syntax !]
 
@@ -66,4 +75,5 @@ that aren't really accented, but are a combination of two or more characters. Ex
 include the [sz] from German, the [ae] and [oe] ligatures, or the ellipsis [...]
 character. As you might expect, there are codes to handle these cases, too.
 Here's a collection of some of the characters you might need to type:"""
+    
 }

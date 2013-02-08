@@ -40,63 +40,6 @@ trait EzmlTokens extends Tokens {
   case object BREAK extends Token {
     def chars ="[/]"
   }
-  /*case object L_BOLD extends Token {
-    def chars = "[*"
-  }
-  case object R_BOLD extends Token {
-    def chars = "*]"
-  }
-  case object L_ITALIC extends Token {
-    def chars = "[/"
-  }
-  case object R_ITALIC extends Token {
-    def chars = "/]"
-  }
-  case object L_CODE extends Token {
-    def chars = "[="
-  }
-  case object R_CODE extends Token {
-    def chars = "=]"
-  }
-  case object L_SUP extends Token {
-    def chars = "[^"
-  }
-  case object R_SUP extends Token {
-    def chars = "^]"
-  }
-  case object L_SUB extends Token {
-    def chars = "[_"
-  }
-  case object R_SUB extends Token {
-    def chars = "_]"
-  }
-  case object L_LINK extends Token {
-    def chars = "[8"
-  }
-  case object R_LINK extends Token {
-    def chars = "8]"
-  }
-  case object L_DIV extends Token {
-    def chars = "[@"
-  }
-  case object R_DIV extends Token {
-    def chars = "@]"                                      def nonFirstTextLine: Parser[List[TextExpr]] =
-    NEWLINE~textLine ^^ { case linebreak~text => text }
-
-
-  }
-  case object L_FOOT extends Token {
-    def chars = "[("
-  }
-  case object R_FOOT extends Token {
-    def chars = ")]"
-  }
-  case object L_IMG extends Token {
-    def chars = "[{"
-  }
-  case object R_IMG extends Token {
-    def chars = "}]"
-  }*/
   case class L_HEADER(level: Int) extends Token {
     def chars = "[" + "!" * level
   }
@@ -124,14 +67,6 @@ trait EzmlTokens extends Tokens {
   case class SPACE(num: Int) extends Token {
     def chars = " " * num
   }
-
-  /*case class TAB(s: String) extends Token {
-    def chars = s
-  }
-
-  case class SMALL_SPACE(s: String) extends Token {
-    def chars = s
-  }*/
 
   case object UNORDERED_BULLET extends Token {
     def chars = "*"
@@ -179,7 +114,8 @@ object EzmlLexer extends Lexical with RegexParsers with EzmlTokens {
   def whitespace = success()
 
   def token: Parser[Token] = (
-    "[ ]+".r ^^ (s => SPACE(s.length))
+    //TODO: need to deal with tabs that aren't at the beginning of a tab-stop?
+    "[ \t]+".r ^^ (s => SPACE(s.replace("\t", " " * TAB_WIDTH).length))
       | "[[" ^^^ L_BRACKET
       | "]]" ^^^ R_BRACKET
       | "[/]" ^^^ BREAK
@@ -190,11 +126,9 @@ object EzmlLexer extends Lexical with RegexParsers with EzmlTokens {
       | """[\*=/^_8@#\)\}]\](?!\])""".r ^^ (s => R_TAG(s.substring(0, s.length - 1)))
       | """>[ \t]*""".r ^^ (s => QUOTE_MARK(s.replace("\t", " " * TAB_WIDTH).length - 1))
       | """-+""".r ^^ (s => DASH(s.length))
-//      | """(\t| )[ \t]*""".r ^^ (s => SPACE(s.replace("\t", " " * TAB_WIDTH).length))
-//      | """\*\s*""".r ^^ (s => UNORDERED_BULLET())
-//      | """((%s)\.)\s*""".format(listStarts).r ^^ (s => NUMBERED_BULLET(s))
+      | """\*\s*""".r ^^^ UNORDERED_BULLET
+      | """((%s)\.)\s*""".format(listStarts).r ^^ (s => NUMBERED_BULLET(s))
       | """\r\n|\n|\r""".r ^^^ NEWLINE
-//      | """[^\[\]\n\!]+(?:(?!\])|(?=\]\]))""".r ^^ (s => TEXT(s))
       | """([^\[\] \n\-](?!(?:!{1,6}|[\*=/^_8@#\)\}])\]))*[^\[\] \n\-]""".r ^^ (s => TEXT(s))
   )
     
