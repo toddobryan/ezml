@@ -7,6 +7,7 @@ import util.matching.Regex.Match
 import util.parsing.combinator.syntactical.TokenParsers
 import util.parsing.combinator.lexical.{Scanners, Lexical}
 import util.parsing.input.{NoPosition, Reader}
+import scala.util.parsing.combinator.PackratParsers
 
 trait EzmlTokens extends Tokens {
   val entities =
@@ -91,31 +92,38 @@ trait EzmlTokens extends Tokens {
   case class TEXT(s: String) extends Token {
     def chars = s
   }
-
-  case class MY_EOF() extends Token {
-    def chars = ""
-  }
 }
 
 
-object EzmlLexer extends Lexical with RegexParsers with EzmlTokens {
+class EzmlLexer extends Lexical with RegexParsers with EzmlTokens {
   override type Elem = Char
   type Tokens = EzmlTokens
   val TAB_WIDTH = 4
 
   import util.parsing.input.CharSequenceReader.EofCh
 
-  def tokens: Parser[List[Token]] = (token.+)~eof ^^ { case tl~_ => tl :+ MY_EOF() }
-
-  def eof: Parser[Token] = EofCh ^^^ MY_EOF()
+  def tokens: Parser[List[Token]] = (nonEof.+ ~ eof) ^^ { case tl ~ eof => tl :+ EOF }
   
   override val whiteSpace = "".r
 
   def whitespace = success()
 
-  def token: Parser[Token] = (
-    //TODO: need to deal with tabs that aren't at the beginning of a tab-stop?
-    "[ \t]+".r ^^ (s => SPACE(s.replace("\t", " " * TAB_WIDTH).length))
+  def token: Parser[Token] = (eof | nonEof) ^^ { case t => {
+      println(t); 
+      t
+    }
+  }
+  
+  def eof: Parser[Token] = new Parser[Token] {
+    def apply(input: Input): ParseResult[Token] = {
+      if (input.atEnd) success(EOF)(input)
+      else failure("Expected: EOF")(input)
+    }
+  }
+  
+  def nonEof: Parser[Token] = (
+      //TODO: need to deal with tabs that aren't at the beginning of a tab-stop?
+      "[ \t]+".r ^^ (s => SPACE(s.replace("\t", " " * TAB_WIDTH).length))
       | "[[" ^^^ L_BRACKET
       | "]]" ^^^ R_BRACKET
       | "[/]" ^^^ BREAK
@@ -128,92 +136,43 @@ object EzmlLexer extends Lexical with RegexParsers with EzmlTokens {
       | """-+""".r ^^ (s => DASH(s.length))
       | """\*\s*""".r ^^^ UNORDERED_BULLET
       | """((%s)\.)\s*""".format(listStarts).r ^^ (s => NUMBERED_BULLET(s))
-      | """\r\n|\n|\r""".r ^^^ NEWLINE
+      | """(\r)?\n""".r ^^^ NEWLINE
       | """([^\[\] \n\-](?!(?:!{1,6}|[\*=/^_8@#\)\}])\]))*[^\[\] \n\-]""".r ^^ (s => TEXT(s))
   )
     
   def Scanner(input: String) = new Scanner(input)
   def Scanner(input: Reader[Char]) = new Scanner(input)
-  
-  def tokens(input: String): List[Token] = 
-    Stream.iterate(EzmlLexer.Scanner(input))(_.rest).takeWhile(!_.atEnd).map(_.first).toList
-
-  
-//  def Scanner(input: String): Reader[Token] = {
-//    class TokenReader(val theTokens: List[Token]) extends Reader[Token] {
-//      def atEnd = theTokens.isEmpty
-//      def first = {
-//        if (theTokens.isEmpty) {
-//          MY_EOF()
-//        } else {
-//          //println(theTokens.head)
-//          theTokens.head
-//        }
-//      }
-//      def pos = NoPosition
-//      def rest = {
-//        if (theTokens.isEmpty) {
-//          new TokenReader(Nil)
-//        } else {
-//          new TokenReader(theTokens.tail)
-//        }
-//      }
-//
-//    }
-//    val allTheTokens = parseAll(tokens, input).get
-//    new TokenReader(allTheTokens)
-//  }
 }
+
+class EzmlParser extends TokenParsers with PackratParsers {
+  override type Tokens = EzmlTokens
+  val lexical = new EzmlLexer()
+  override type Elem = lexical.Token
+  import Document._
+  
+  def parse(input: String): ParseResult[_] = doc(new PackratReader(new lexical.Scanner(input)))
+  
+  lazy val doc: PackratParser[Pandoc] = block.+ ^^ (blocks => Pandoc(Meta(Nil, Nil, Nil), blocks))
+  
+  lazy val block: PackratParser[Block] = para
+  
+  lazy val para: PackratParser[Para] = inline.+ <~ elem(lexical.EOF) ^^ (inlines => Para(inlines))
+  
+  lazy val plain: PackratParser[Plain] = rep1(inline) ^^ (inlines => Plain(inlines))
+
+  lazy val inline: PackratParser[Inline] = str | space
+
+  lazy val str: PackratParser[Str] = elem("Str", _.isInstanceOf[lexical.TEXT]) ^^ (t => Str(t.chars))
+  lazy val space: PackratParser[Inline] = elem("Space", _.isInstanceOf[lexical.SPACE]) ^^^ Space
+  lazy val blankLine: PackratParser[_] = space.* ~ (lexical.NEWLINE | lexical.EOF)
+}
+
 
 /*
-
-object EzmlSyntax {
-  abstract class TextFragment
-  case class TaggedText(kind: String, contents: List[TextFragment]) extends TextFragment
-  case class PlainText(contents: String) extends TextFragment
-
-  abstract class EzmlExpr
-  case class Document(contents: List[EzmlExpr]) extends EzmlExpr
-
-  abstract class Block extends EzmlExpr
-  case class Paragraph(contents: List[ParBlock]) extends Block
-  case class HeaderBlock(level: Int, contents: List[EzmlParser.lexical.Token]) extends Block
-
-  abstract class ParBlock extends EzmlExpr
-  case class PreBlock(lines: List[Line]) extends ParBlock
-  case class TextBlock(lines: List[TextLine]) extends ParBlock
-  case class QuoteBlock(lines: List[QuoteLine]) extends ParBlock
-
-  abstract class ListBlock extends ParBlock
-  case class UnorderedListBlock(items: List[UnorderedListItem]) extends ListBlock
-  case class NumberedListBlock(items: List[NumberedListItem]) extends ListBlock
-
-  abstract class ListItem extends EzmlExpr
-  case class UnorderedListItem(lines: List[Line]) extends ListItem
-  case class NumberedListItem(number: String, lines: List[Line]) extends ListItem
-
-  abstract class Line extends EzmlExpr
-  case class TextLine(tokens: List[EzmlParser.lexical.Token]) extends Line
-  case class IndentedLine(spaces: Int, tokens: List[EzmlParser.lexical.Token]) extends Line
-  case class QuoteLine(tokens: List[EzmlParser.lexical.Token]) extends Line
-  case class NumberedBulletLine(bullet: String, space: Int, tokens: List[EzmlParser.lexical.Token]) extends Line
-  case class EmptyLine() extends Line
-
-  def tagType(leftKind: String): String = {
-    leftKind match {
-      case "=" => "code"
-      case "*" => "strong"
-      case "/" => "em"
-      case "^" => "sup"
-      case "_" => "sub"
-    }
-  }
-}
-
-object EzmlParser extends TokenParsers {
+ object EzmlParser extends TokenParsers {
   type Tokens = EzmlTokens
   import EzmlSyntax._
-  val lexical = new EzmlLexical
+  val lexical = EzmlLexer
 
   def TokenParser[T](name: String, cond: (lexical.Token => Boolean) = ((e: lexical.Token) => e.isInstanceOf[T])): Parser[T] = {
     elem(name, cond) ^^
@@ -225,10 +184,10 @@ object EzmlParser extends TokenParsers {
       e.asInstanceOf[lexical.SPACE].num >= lexical.TAB_WIDTH))
   val SPACE = TokenParser[lexical.SPACE]("SPACE")
   val ENTITY = TokenParser[lexical.ENTITY]("ENTITY")
-  val UNORDERED_BULLET = TokenParser[lexical.UNORDERED_BULLET]("UNORDERED_BULLET")
+  val UNORDERED_BULLET = elem()
   val NUMBERED_BULLET = TokenParser[lexical.NUMBERED_BULLET]("NUMBERED_BULLET")
   val QUOTE_MARK = TokenParser[lexical.QUOTE_MARK]("QUOTE_MARK")
-  val NEWLINE = TokenParser[lexical.NEWLINE]("NEWLINE")
+  val NEWLINE = TokenParser[NEWLINE]("NEWLINE")
   val TEXT = TokenParser[lexical.TEXT]("TEXT")
   val L_TAG = TokenParser[lexical.L_TAG]("L_TAG")
   val R_TAG = TokenParser[lexical.R_TAG]("R_TAG")
