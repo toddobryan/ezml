@@ -9,6 +9,8 @@ import util.parsing.combinator.lexical.{Scanners, Lexical}
 import util.parsing.input.{NoPosition, Reader}
 import scala.util.parsing.combinator.PackratParsers
 
+import document._
+
 trait EzmlTokens extends Tokens {
   val entities =
     List("""['"][aeiouyAEIOUY]""",
@@ -24,6 +26,22 @@ trait EzmlTokens extends Tokens {
          """\.\.\.""",
          """o[aA]""",
          """/[oO]""").map("(?:%s)".format(_)).mkString("|")
+         
+  val entityMap = Map(
+    "'a" -> "á", "'e" -> "é", "'i" -> "í", "'o" -> "ó", "'u" -> "ú", "'y" -> "ý",
+    "'A" -> "Á", "'E" -> "É", "'I" -> "Í", "'O" -> "Ó", "'U" -> "Ú", "'Y" -> "Ý",
+    "\"a" -> "ä", "\"e" -> "ë", "\"i" -> "ï", "\"o" -> "ö", "\"u" -> "ü", "\"y" -> "ÿ",
+    "\"A" -> "Ä", "\"E" -> "Ë", "\"I" -> "Ï", "\"O" -> "Ö", "\"U" -> "Ü", "\"Y" -> "Ÿ",
+    "`a" -> "à", "`e" -> "è", "`i" -> "ì", "`o" -> "ò", "`u" -> "ù",
+    "`A" -> "À", "`E" -> "È", "`I" -> "Ì", "`O" -> "Ò", "`U" -> "Ù",
+    "^a" -> "â", "^e" -> "ê", "^i" -> "î", "^o" -> "ô", "^u" -> "û",
+    "^A" -> "Â", "^E" -> "Ê", "^I" -> "Î", "^O" -> "Ô", "^U" -> "Û",
+    "~a" -> "ã", "~n" -> "ñ", "~o" -> "õ", "~A" -> "Ã", "~N" -> "Ñ", "~O" -> "Õ",
+    ",c" -> "ç", ",C" -> "Ç",
+    "^!" -> "¡", "^?" -> "¿",
+    "ae" -> "æ", "AE" -> "Æ", "oe" -> "œ", "OE" -> "Œ", "sz" -> "ß",
+    "..." -> "…", "oa" -> "å", "oA" -> "Å", "/o" -> "ø", "/O" -> "Ø"
+  )
 
   val listStarts =
     List("""#""",
@@ -124,10 +142,10 @@ class EzmlLexer extends Lexical with RegexParsers with EzmlTokens {
   def token: Parser[Token] = (
       //TODO: need to deal with tabs that aren't at the beginning of a tab-stop?
       "[ \t]+".r ^^ (s => SPACE(s.replace("\t", " " * TAB_WIDTH).length))
-      | "[[" ^^^ L_BRACKET
-      | "]]" ^^^ R_BRACKET
+      | "[[" ^^^ TEXT("[")
+      | "]]" ^^^ TEXT("]")
       | "[/]" ^^^ BREAK
-      | """\[(%s)\]""".format(entities).r ^^ (s => ENTITY(s.substring(1, s.length - 1)))
+      | """\[(%s)\]""".format(entities).r ^^ (s => TEXT(entityMap(s)))
       | """\[!{1,6}""".r ^^ (s => L_HEADER(s.length - 1))
       | """!{1,6}\](?!\])""".r ^^ (s => R_HEADER(s.length - 1))
       | """\[[\*=/^_8@#\(\{]""".r ^^ (s => L_TAG(s.substring(1)))
@@ -148,29 +166,52 @@ class EzmlParser extends TokenParsers with PackratParsers {
   override type Tokens = EzmlTokens
   val lexical = new EzmlLexer()
   override type Elem = lexical.Token
-  import Document._
   
   def parse(input: String): ParseResult[_] = doc(new PackratReader(new lexical.Scanner(input)))
   
-  lazy val doc: PackratParser[Pandoc] = block.+ <~ eof ^^ (blocks => Pandoc(Meta(Nil, Nil, Nil), blocks))
+  lazy val doc: PackratParser[Pandoc] = (block <~ blankLine.*).+ <~ eof ^^ (blocks => Pandoc(Meta(Nil, Nil, Nil), blocks))
   
-  lazy val block: PackratParser[Block] = para
-  
-  lazy val para: PackratParser[Para] = inline.+ <~ paraBreak ^^ (inlines => Para(inlines))
-  
-  lazy val paraBreak: PackratParser[Any] = (
-      lexical.NEWLINE.? ~ blankLine.* ~ eof |
-      lexical.NEWLINE ~ blankLine.+
-  )
+  lazy val block: PackratParser[Block] = para | header
   
   lazy val plain: PackratParser[Plain] = rep1(inline) ^^ (inlines => Plain(inlines))
-
-  lazy val inline: PackratParser[Inline] = str | space
-
-  lazy val str: PackratParser[Str] = elem("Str", _.isInstanceOf[lexical.TEXT]) ^^ (t => Str(t.chars))
-  lazy val space: PackratParser[Inline] = elem("Space", _.isInstanceOf[lexical.SPACE]) ^^^ Space
-  lazy val blankLine: PackratParser[_] = space.* ~ (lexical.NEWLINE | lexical.EOF)
+  lazy val para: PackratParser[Para] = inline.+ <~ paraBreak ^^ (inlines => Para(inlines))
+  lazy val header: PackratParser[Header] = (
+      lexical.L_HEADER(1) ~> trimmedInlines <~ lexical.R_HEADER(1) ^^ (inlines => Header(1, inlines)) |
+      lexical.L_HEADER(2) ~> trimmedInlines <~ lexical.R_HEADER(2) ^^ (inlines => Header(2, inlines)) |
+      lexical.L_HEADER(3) ~> trimmedInlines <~ lexical.R_HEADER(3) ^^ (inlines => Header(3, inlines)) |
+      lexical.L_HEADER(4) ~> trimmedInlines <~ lexical.R_HEADER(4) ^^ (inlines => Header(4, inlines)) |
+      lexical.L_HEADER(5) ~> trimmedInlines <~ lexical.R_HEADER(5) ^^ (inlines => Header(5, inlines)) |
+      lexical.L_HEADER(6) ~> trimmedInlines <~ lexical.R_HEADER(6) ^^ (inlines => Header(6, inlines))
+  )
   
+  def removeSpaces(list: List[Inline]): List[Inline] = {
+    def removeFromFront(ls: List[Inline]): List[Inline] = ls match {
+      case Space :: rst => removeFromFront(rst)
+      case _ => ls
+    }
+    removeFromFront(removeFromFront(list.reverse).reverse)
+  }
+  
+  lazy val trimmedInlines: PackratParser[List[Inline]] = inline.+ ^^ (inlines => removeSpaces(inlines))
+  
+  lazy val paraBreak: PackratParser[Any] = blankLine | eof
+  
+  lazy val inline: PackratParser[Inline] = nonSpace | space
+  
+  lazy val nonSpace: PackratParser[Inline] = str | code
+
+  lazy val str: PackratParser[Str] = elem("Str", _.isInstanceOf[lexical.TEXT]).+ ^^ (ts => Str(ts.map(_.chars).mkString))
+   
+  lazy val code: PackratParser[Code] =
+    lexical.L_TAG("=") ~> inline.+ <~ lexical.R_TAG("=") ^^ (inlines => Code(NullAttr, inlines))
+  
+  lazy val space: PackratParser[Inline] = (
+      elem("Space", _.isInstanceOf[lexical.SPACE]) ^^^ Space |
+      guard(not(blankLine)) ~ lexical.NEWLINE ^^^ Space
+  )
+
+  lazy val blankLine: PackratParser[Any] = lexical.NEWLINE ~ space.* ~ (lexical.NEWLINE | eof)
+
   lazy val eof = new Parser[Any] {
     def apply(input: Input) = if (input.atEnd) Success("EOF", input) else Failure("Expected EOF", input)
   }

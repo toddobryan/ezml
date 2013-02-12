@@ -3,6 +3,7 @@ package ezml
 import org.scalatest.FunSuite
 import scala.io.Source
 import scala.util.parsing.input.CharSequenceReader
+import document._
 
 class TestLexer extends FunSuite {
   val lexer = new EzmlLexer()
@@ -39,6 +40,26 @@ class TestLexer extends FunSuite {
   //}
 }
 
+class TestParser extends FunSuite {
+  val parser = new EzmlParser()
+  
+  test("paragraphs") {
+    assert(parser.parse(Examples.pars).get.toString === 
+      Pandoc(Meta(List(),List(),List()),
+        List(
+          Para(List(Str("These"), Space, Str("are"), Space, Str("some"), Space, Str("short"), Space, Str("paragraphs."))), 
+          Para(List(Str("Hopefully,"), Space, Str("we"), Space, Str("think."))), 
+          Para(List(Str("Maybe."))))).toString)
+    assert(parser.parse(Examples.hs).get.toString ===
+      Pandoc(Meta(List(),List(),List()),
+        List(
+          Header(1,List(Str("Header1"))), 
+          Para(List(Str("A"), Space, Str("short"), Space, Str("paragraph."))), 
+          Header(2,List(Str("Header2"))), 
+          Para(List(Str("Another"), Space, Str("short"), Space, Str("paragraph."))))).toString)
+  }
+}
+
 object Examples {
   def fileContents(filename: String): String = {
     Source.fromInputStream(getClass.getResourceAsStream(filename)).mkString
@@ -50,6 +71,15 @@ object Examples {
 Hopefully, we think.
 
 Maybe."""
+    
+  val hs =
+"""[! Header1 !]
+    
+A short paragraph.
+    
+[!! Header2 !!]
+    
+Another short paragraph."""
 
   val e1 = 
 """[! Syntax !]
