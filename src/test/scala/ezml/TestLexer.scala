@@ -12,24 +12,24 @@ class TestLexer extends FunSuite {
     lexer.tokens(new CharSequenceReader(input)).get
   
   test("lexify") {
-    assert(tokens("[[ ]]") === List(L_BRACKET, SPACE(1), R_BRACKET, EOF))
-    assert(tokens("[/]") === List(BREAK, EOF))
+    assert(tokens("[[ ]]") === List(L_BRACKET, SPACE(1), R_BRACKET))
+    assert(tokens("[/]") === List(BREAK))
     assert(tokens("[! Text !]") ===
-             List(L_HEADER(1), SPACE(1), TEXT("Text"), SPACE(1), R_HEADER(1), EOF))
+             List(L_HEADER(1), SPACE(1), TEXT("Text"), SPACE(1), R_HEADER(1)))
     assert(tokens("[!! Text !!]") ===
-             List(L_HEADER(2), SPACE(1), TEXT("Text"), SPACE(1), R_HEADER(2), EOF))
+             List(L_HEADER(2), SPACE(1), TEXT("Text"), SPACE(1), R_HEADER(2)))
     //TODO: rest of the header types
-    assert(tokens("[*bold*]") === List(L_TAG("*"), TEXT("bold"), R_TAG("*"), EOF))
-    assert(tokens("[* bold *]") === List(L_TAG("*"), SPACE(1), TEXT("bold"), SPACE(1), R_TAG("*"), EOF))
-    assert(tokens("[/italic/]") === List(L_TAG("/"), TEXT("italic"), R_TAG("/"), EOF))
-    assert(tokens("[=monospace=]") === List(L_TAG("="), TEXT("monospace"), R_TAG("="), EOF))
+    assert(tokens("[*bold*]") === List(L_TAG("*"), TEXT("bold"), R_TAG("*")))
+    assert(tokens("[* bold *]") === List(L_TAG("*"), SPACE(1), TEXT("bold"), SPACE(1), R_TAG("*")))
+    assert(tokens("[/italic/]") === List(L_TAG("/"), TEXT("italic"), R_TAG("/")))
+    assert(tokens("[=monospace=]") === List(L_TAG("="), TEXT("monospace"), R_TAG("=")))
     
   }
   
   test("entities") {
     assert(tokens("['a]['e]['i]['o]['u]['y]['A]['E]['I]['O]['U]['Y]") ===
       List(ENTITY("'a"), ENTITY("'e"), ENTITY("'i"), ENTITY("'o"), ENTITY("'u"), ENTITY("'y"),
-           ENTITY("'A"), ENTITY("'E"), ENTITY("'I"), ENTITY("'O"), ENTITY("'U"), ENTITY("'Y"), EOF))
+           ENTITY("'A"), ENTITY("'E"), ENTITY("'I"), ENTITY("'O"), ENTITY("'U"), ENTITY("'Y")))
    //TODO: rest of the entities
   }
   

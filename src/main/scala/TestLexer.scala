@@ -22,7 +22,7 @@ class TestLexer extends Lexical with RegexParsers with TestTokens {
   
   override val whiteSpace = "".r
   def whitespace = success()
-  
+    
   def token: Parser[Token] = (
     elem(EofCh) ^^^ EOF |
     "[aeiou]".r ^^ (s => VOWEL(s))

@@ -102,26 +102,26 @@ class EzmlLexer extends Lexical with RegexParsers with EzmlTokens {
 
   import util.parsing.input.CharSequenceReader.EofCh
 
-  def tokens: Parser[List[Token]] = (nonEof.+ ~ eof) ^^ { case tl ~ eof => tl :+ EOF }
+  def tokens: Parser[List[Token]] = token.+ 
   
   override val whiteSpace = "".r
 
   def whitespace = success()
 
-  def token: Parser[Token] = (eof | nonEof) ^^ { case t => {
-      println(t); 
-      t
-    }
-  }
+//  def token: Parser[Token] = (eof | nonEof) ^^ { case t => {
+//      println(t); 
+//      t
+//    }
+//  }
+//  
+//  def eof: Parser[Token] = new Parser[Token] {
+//    def apply(input: Input): ParseResult[Token] = {
+//      if (input.atEnd) success(EOF)(input)
+//      else failure("Expected: EOF")(input)
+//    }
+//  }
   
-  def eof: Parser[Token] = new Parser[Token] {
-    def apply(input: Input): ParseResult[Token] = {
-      if (input.atEnd) success(EOF)(input)
-      else failure("Expected: EOF")(input)
-    }
-  }
-  
-  def nonEof: Parser[Token] = (
+  def token: Parser[Token] = (
       //TODO: need to deal with tabs that aren't at the beginning of a tab-stop?
       "[ \t]+".r ^^ (s => SPACE(s.replace("\t", " " * TAB_WIDTH).length))
       | "[[" ^^^ L_BRACKET
@@ -152,11 +152,16 @@ class EzmlParser extends TokenParsers with PackratParsers {
   
   def parse(input: String): ParseResult[_] = doc(new PackratReader(new lexical.Scanner(input)))
   
-  lazy val doc: PackratParser[Pandoc] = block.+ ^^ (blocks => Pandoc(Meta(Nil, Nil, Nil), blocks))
+  lazy val doc: PackratParser[Pandoc] = block.+ <~ eof ^^ (blocks => Pandoc(Meta(Nil, Nil, Nil), blocks))
   
   lazy val block: PackratParser[Block] = para
   
-  lazy val para: PackratParser[Para] = inline.+ <~ elem(lexical.EOF) ^^ (inlines => Para(inlines))
+  lazy val para: PackratParser[Para] = inline.+ <~ paraBreak ^^ (inlines => Para(inlines))
+  
+  lazy val paraBreak: PackratParser[Any] = (
+      lexical.NEWLINE.? ~ blankLine.* ~ eof |
+      lexical.NEWLINE ~ blankLine.+
+  )
   
   lazy val plain: PackratParser[Plain] = rep1(inline) ^^ (inlines => Plain(inlines))
 
@@ -165,6 +170,10 @@ class EzmlParser extends TokenParsers with PackratParsers {
   lazy val str: PackratParser[Str] = elem("Str", _.isInstanceOf[lexical.TEXT]) ^^ (t => Str(t.chars))
   lazy val space: PackratParser[Inline] = elem("Space", _.isInstanceOf[lexical.SPACE]) ^^^ Space
   lazy val blankLine: PackratParser[_] = space.* ~ (lexical.NEWLINE | lexical.EOF)
+  
+  lazy val eof = new Parser[Any] {
+    def apply(input: Input) = if (input.atEnd) Success("EOF", input) else Failure("Expected EOF", input)
+  }
 }
 
 
