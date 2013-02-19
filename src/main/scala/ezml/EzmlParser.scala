@@ -118,9 +118,11 @@ class EzmlLexer extends Lexical with RegexParsers with EzmlTokens {
   type Tokens = EzmlTokens
   val TAB_WIDTH = 4
 
-  import util.parsing.input.CharSequenceReader.EofCh
-
+  import util.parsing.input.CharSequenceReader
+  
   def tokens: Parser[List[Token]] = token.+ 
+  
+  def tokens(input: String): List[Token] = tokens.apply(new CharSequenceReader(input)).get
   
   override val whiteSpace = "".r
 
@@ -145,13 +147,18 @@ class EzmlLexer extends Lexical with RegexParsers with EzmlTokens {
       | "[[" ^^^ TEXT("[")
       | "]]" ^^^ TEXT("]")
       | "[/]" ^^^ BREAK
-      | """\[(%s)\]""".format(entities).r ^^ (s => TEXT(entityMap(s)))
+      | """\[(%s)\]""".format(entities).r ^^ (s => TEXT(entityMap(s.substring(1, s.length - 1))))
       | """\[!{1,6}""".r ^^ (s => L_HEADER(s.length - 1))
       | """!{1,6}\](?!\])""".r ^^ (s => R_HEADER(s.length - 1))
       | """\[[\*=/^_8@#\(\{]""".r ^^ (s => L_TAG(s.substring(1)))
       | """[\*=/^_8@#\)\}]\](?!\])""".r ^^ (s => R_TAG(s.substring(0, s.length - 1)))
       | """>[ \t]*""".r ^^ (s => QUOTE_MARK(s.replace("\t", " " * TAB_WIDTH).length - 1))
-      | """-+""".r ^^ (s => DASH(s.length))
+      | """-+""".r ^^ { 
+        case "-" => TEXT("-") // hyphen
+        case "--" => TEXT("–") // en dash
+        case "---" => TEXT("—") // em dash
+        case s => DASH(s.length)
+      }
       | """\*\s*""".r ^^^ UNORDERED_BULLET
       | """((%s)\.)\s*""".format(listStarts).r ^^ (s => NUMBERED_BULLET(s))
       | """(\r)?\n""".r ^^^ NEWLINE
@@ -198,12 +205,15 @@ class EzmlParser extends TokenParsers with PackratParsers {
   
   lazy val inline: PackratParser[Inline] = nonSpace | space
   
-  lazy val nonSpace: PackratParser[Inline] = str | code
+  lazy val nonSpace: PackratParser[Inline] = str | code | link
 
   lazy val str: PackratParser[Str] = elem("Str", _.isInstanceOf[lexical.TEXT]).+ ^^ (ts => Str(ts.map(_.chars).mkString))
-   
+  
   lazy val code: PackratParser[Code] =
     lexical.L_TAG("=") ~> inline.+ <~ lexical.R_TAG("=") ^^ (inlines => Code(NullAttr, inlines))
+    
+  lazy val link: PackratParser[Link] =
+    lexical.L_TAG("@") ~> space.* ~> str <~ space.* <~ lexical.R_TAG("@") ^^ (s => Link(Nil, Target("#" + s.str, s.str)))
   
   lazy val space: PackratParser[Inline] = (
       elem("Space", _.isInstanceOf[lexical.SPACE]) ^^^ Space |

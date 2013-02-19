@@ -105,7 +105,7 @@ lot of trouble."""
 One of the strengths of HTML is that it's designed to be used by people all
 over the world and it has been able to handle international character sets from
 its beginning. Unfortunately, it has sometimes been difficult to type those
-characters, but with EZML it's--you guessed it--easy.
+characters, but with EZML it's---you guessed it---easy.
 
 To type an accented character, you use brackets followed by a character that
 should remind you of the accent. For an acute accent, we use the apostrophe: '.
